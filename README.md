@@ -8,6 +8,8 @@ Please cite the paper Penny et al. [2018 arXiv:1806.?????]() when using the figu
 
 ## sensitivity/
 
+[PDF plot](https://github.com/mtpenny/wfirst-ml-figures/blob/master/sensitivity/NRO_layout_7f_3_covfac_52_3_sensitivity.pdf)
+
 Plot of the WFIRST microlensing survey's predicted sensitivity
 
 References/Credit:
@@ -18,6 +20,8 @@ This research has made use of the NASA Exoplanet Archive, which is operated by t
 
 
 ## fields/
+
+[PDF plot](https://github.com/mtpenny/wfirst-ml-figures/blob/master/fields/wfirst-fields.pdf)
 
 The WFIRST microlensing survey's fields
 
