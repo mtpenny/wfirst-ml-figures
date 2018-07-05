@@ -2,16 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from itertools import groupby
-#import matplotlib.gridspec as gridspec
+
+import matplotlib.font_manager as fm
+import sys
+import os
+
+import matplotlib
+if float(matplotlib.__version__[0:3])>=2:
+    plt.style.use('classic')
 
 layout='layout_7f_3'
+
 
 plotchips=0
 plotcenters=0
 plotoutlines=1
 
 fig = plt.figure(figsize=(6,6))
-#gridspec.GridSpec(4,1)
+
 
 plt.rcParams["font.family"] = 'FreeSerif'
 plt.rcParams["font.size"] = 16
@@ -25,9 +33,6 @@ plt.rcParams['ytick.major.width'] = 2
 plt.rcParams['ytick.minor.size'] = 5
 plt.rcParams['ytick.minor.width'] = 2
 
-#fig,(ax1,ax2) = plt.subplots(2,1,gridspec_kw={'height_ratios':[1,3]})
-#ax1 = plt.subplot2grid((4,1),(0,0))
-#ax2 = plt.subplot2grid((4,1),(1,0),rowspan=3)
 ax2 = fig.add_axes([0.0,0.12,0.95,0.6])
 ax2.zorder=1
 ax1 = fig.add_axes([0.025,0.75,0.95,0.2])
@@ -99,7 +104,7 @@ if plotchips==1:
 #Put a number at the center of each field
 if plotcenters==1:
     centers = np.loadtxt('%s.centers' % (layout))
-    #plt.plot(centers[:,1],centers[:,2],'ko')
+    plt.plot(centers[:,1],centers[:,2],'ko')
     for f,x,y in centers:
         ax2.text(x,y,'%d' % (f),ha='center',va='center')
 
@@ -112,16 +117,20 @@ ax1.plot([-3.0,-52.5],[3.0,-25.5],'k-',clip_on=False)
 ax1.set_xlim([90,-90])
 ax1.set_ylim([-20,20])
 
+
+
+
+
 ax2.text(2.8,2.55,'Extinction map: Gonzalez et al. $(2012)$',fontsize=8)
 ax2.text(0.8,-0.11,'Credit: Penny et al. $(2018)$',fontsize=12,transform=ax2.transAxes)
-ax2.text(0.8,-0.16,'arXiv:1806.XXXXX',fontsize=12,transform=ax2.transAxes)
+ax2.text(0.8,-0.16,'arXiv:1807.XXXXX',fontsize=12,transform=ax2.transAxes)
 ax2.set_xlim([xmax,xmin])
 ax2.set_ylim([ymin,ymax])
-ax2.set_xlabel(r'$l$ $[$deg$]$',fontsize=20)
-ax2.set_ylabel(r'$b$ $[$deg$]$',fontsize=20)
+ax2.set_xlabel(r'$l$ $[$deg$]$',fontsize=18)
+ax2.set_ylabel(r'$b$ $[$deg$]$',fontsize=18)
 cbar = plt.colorbar(extmap,ax=ax2)
 cbar.set_label(r'$A_H$',fontsize=20)
 cbar.locator = ticker.MaxNLocator(nbins=4*2)
 cbar.update_ticks()
-#plt.tight_layout()
+
 plt.savefig('wfirst-fields.pdf',dpi=300)

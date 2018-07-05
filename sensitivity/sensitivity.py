@@ -11,6 +11,8 @@ covfac="layout_7f_3_covfac" #sys.argv[2]
 texp=52 #sys.argv[3]
 nplanets=3 #sys.argv[4]
 
+timeout=60
+
 root = '%s_%s_%s_%s' % (design,covfac,texp,nplanets)
 
 import matplotlib.pyplot as plt
@@ -19,6 +21,10 @@ import json
 import warnings
 import os
 import time
+
+import matplotlib
+if float(matplotlib.__version__[0:3])>=2:
+    plt.style.use('classic')
 
 
 
@@ -74,24 +80,27 @@ cbar.ax.set_yticklabels(['0.1','1','10','100','1000','10000'])
 
 #The Kepler planets
 
+import requests
+
 #Download the data from the exoplanets archive
 koifname='cumulative.csv'
 if (not os.path.isfile(koifname)) or (time.time()-os.path.getmtime(koifname))/3600.0 > 24.0:
-    print("Downloading KOIs from NASA exoplanet archive... (will timeout after 60s)")
-    import requests
+    print("Downloading KOIs from NASA exoplanet archive... (will timeout after %gs)" % (timeout))
     try:
-        koirequest = requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=cumulative&select=*&format=csv&",timeout=60.0)
+        koirequest = requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=cumulative&select=*&format=csv&",timeout=timeout)
         koifile = open(koifname,'w')
         koifile.write(koirequest.content)
         koifile.close()
     except:
         print("Error downloading KOIs - will use existing file (%s) if it exists." % (koifname))
-        print("Note: 60s timeout used. Try changing this if you have a slow connection.")
+        print("Note: %gs timeout used. Try changing this if you have a slow connection." % (timeout))
+        print("or use: wget -O %s 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=cumulative&select=*&format=csv&'" % (koifname))
+        sys.exit()
 else:
     print("Using existing KOI file")
 
 #,skip_header=147 #use this if manually downloaded
-keplerplanets = np.genfromtxt('cumulative.csv',delimiter=',',names=True)
+keplerplanets = np.genfromtxt(koifname,delimiter=',',names=True)
 print(keplerplanets[:]['koi_score'])
 kepmask = keplerplanets[:]['koi_score']>0.5
 kepdots = keplerplanets[kepmask]
@@ -109,23 +118,26 @@ ax.plot(ksemimajor(kepdots),massradius(kepdots),'o',mew=0,color='r',ms=3,label='
 
 
 #Non-Kepler planets
-planetsfname='planets.csv'
+planetsfname='exoplanets.csv'
 if (not os.path.isfile(planetsfname)) or (time.time()-os.path.getmtime(planetsfname))/3600.0 > 24.0:
     print("Downloading other planets from NASA exoplanet archive...")
     try:
-        gbrequest = requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets",timeout=60.0)
-        gbfile = open('planets.csv','w')
+        print("Downloading exoplanets from NASA exoplanet archive... (will timeout after %gs)" % (timeout))
+        gbrequest = requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets",timeout=timeout)
+        gbfile = open(planetsfname,'w')
         gbfile.write(gbrequest.content)
         gbfile.close()
     except:
         print("Error downloading planets file - will use existing file (%s) if it exists." % (planetsfname))
-        print("Note: 60s timeout used. Try changing this if you have a slow connection.")
+        print("Note: %gs timeout used. Try changing this if you have a slow connection." % (timeout))
+        print("or use: wget -O %s 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets'" % (planetsfname))
+        sys.exit()
 else:
     print("Using existing planets file, downloaded within last 24 hours.")
 
 #,skip_header=69 use this if manually downloaded
-groundplanets = np.genfromtxt('planets.csv',delimiter=',',usecols=(9,21))
-ax.plot(groundplanets[:,0],groundplanets[:,1]*mjup,'o',mew=0,color='k',ms=3,label='Other Known Exoplanets')
+groundplanets = np.genfromtxt(planetsfname,delimiter=',',names=True)
+ax.plot(groundplanets[:]['pl_orbsmax'],groundplanets[:]['pl_bmassj']*mjup,'o',mew=0,color='k',ms=3,label='Other Known Exoplanets')
 
 
 
@@ -217,7 +229,7 @@ ax.text(20,0.25,'$WFIRST$',color='b',rotation=45)
 
 #Weirdly, the right parenthesis character seems to be missing from FreeSerif in standard text
 ax.text(1.0,-0.08,'Credit: Penny et al. $(2018)$',fontsize=12,transform=ax.transAxes)
-ax.text(1.0,-0.12,'arXiv:1806.XXXXX',fontsize=12,transform=ax.transAxes)
+ax.text(1.0,-0.12,'arXiv:1807.XXXXX',fontsize=12,transform=ax.transAxes)
 ax.set_axisbelow(False)
 ax.set_xlabel('Semimajor Axis in AU')
 ax.set_ylabel('Planet Mass in Earth Masses')
