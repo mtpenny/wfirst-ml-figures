@@ -32,3 +32,13 @@ References/Credit:
 [Gaia image](https://www.esa.int/spaceinimages/Images/2018/04/Gaia_s_sky_in_colour) - Gaia Data Processing and Analysis Consortium (DPAC); A. Moitinho / A. F. Silva / M. Barros / C. Barata, University of Lisbon, Portugal; H. Savietto, Fork Research, Portugal
 
 
+## images/
+
+Example WFIRST images generated using the same software as the yield simulations
+
+
+## tables/
+
+Tables describing the survey and its yield.
+
+
