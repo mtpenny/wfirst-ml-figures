@@ -229,7 +229,7 @@ ax.text(20,0.25,'$WFIRST$',color='b',rotation=45)
 
 #Weirdly, the right parenthesis character seems to be missing from FreeSerif in standard text
 ax.text(1.0,-0.08,'Credit: Penny et al. $(2018)$',fontsize=12,transform=ax.transAxes)
-ax.text(1.0,-0.12,'arXiv:1807.XXXXX',fontsize=12,transform=ax.transAxes)
+ax.text(1.0,-0.12,'arXiv:1808.02490',fontsize=12,transform=ax.transAxes)
 ax.set_axisbelow(False)
 ax.set_xlabel('Semimajor Axis in AU')
 ax.set_ylabel('Planet Mass in Earth Masses')

@@ -4,7 +4,7 @@ Figures and data tables for the WFIRST microlensing survey
 
 Python plotting scripts are provided to allow customization of the plots.
 
-Please cite the paper Penny et al. [2018 arXiv:1806.?????]() when using the figures, as well as using the acknowledgments and citations listed for each plot.
+Please cite the paper [Penny et al. (2018) arXiv:1808.02490](https://arxiv.org/abs/1808.02490) when using the figures, as well as using the acknowledgments and citations listed for each plot.
 
 ## sensitivity/
 
