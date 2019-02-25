@@ -1,10 +1,10 @@
 # wfirst-ml-figures
 
-Figures and data tables for the WFIRST microlensing survey
+Figures and data tables for the WFIRST microlensing survey.
 
 Python plotting scripts are provided to allow customization of the plots.
 
-Please cite the paper [Penny et al. (2018) arXiv:1808.02490](https://arxiv.org/abs/1808.02490) when using the figures, as well as using the acknowledgments and citations listed for each plot.
+Please cite the paper [Penny et al. (2019) ApJS 241, 3](https://ui.adsabs.harvard.edu//#abs/2019ApJS..241....3P/abstract) when using the figures, as well as using the acknowledgements and citations listed for each plot.
 
 ## sensitivity/
 
@@ -23,7 +23,7 @@ This research has made use of the NASA Exoplanet Archive, which is operated by t
 
 [PDF plot](https://github.com/mtpenny/wfirst-ml-figures/blob/master/fields/wfirst-fields.pdf)
 
-The WFIRST microlensing survey's fields
+The WFIRST microlensing survey's fields.
 
 References/Credit:
 
@@ -34,7 +34,7 @@ References/Credit:
 
 ## images/
 
-Example WFIRST images generated using the same software as the yield simulations
+Examples of simulated WFIRST microlensing survey images generated using the same software as the yield simulations.
 
 
 ## tables/

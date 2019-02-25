@@ -123,7 +123,7 @@ ax1.set_ylim([-20,20])
 
 ax2.text(2.8,2.55,'Extinction map: Gonzalez et al. $(2012)$',fontsize=8)
 ax2.text(0.8,-0.11,'Credit: Penny et al. $(2018)$',fontsize=12,transform=ax2.transAxes)
-ax2.text(0.8,-0.16,'arXiv:1808.02490',fontsize=12,transform=ax2.transAxes)
+ax2.text(0.9375,-0.16,'ApJS 241, 3',fontsize=12,transform=ax2.transAxes)
 ax2.set_xlim([xmax,xmin])
 ax2.set_ylim([ymin,ymax])
 ax2.set_xlabel(r'$l$ $[$deg$]$',fontsize=18)

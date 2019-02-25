@@ -11,9 +11,12 @@ covfac="layout_7f_3_covfac" #sys.argv[2]
 texp=52 #sys.argv[3]
 nplanets=3 #sys.argv[4]
 
+updateExoplanets=False #Set to true if you want an up-to-date list of exoplanets plotted
 timeout=60
 
+
 root = '%s_%s_%s_%s' % (design,covfac,texp,nplanets)
+shortroot = '%s_%s_%s' % (covfac,texp,nplanets)
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -84,7 +87,7 @@ import requests
 
 #Download the data from the exoplanets archive
 koifname='cumulative.csv'
-if (not os.path.isfile(koifname)) or (time.time()-os.path.getmtime(koifname))/3600.0 > 24.0:
+if (not os.path.isfile(koifname)) or ((time.time()-os.path.getmtime(koifname))/3600.0 > 24.0 and updateExoplanets==True):
     print("Downloading KOIs from NASA exoplanet archive... (will timeout after %gs)" % (timeout))
     try:
         koirequest = requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=cumulative&select=*&format=csv&",timeout=timeout)
@@ -97,7 +100,7 @@ if (not os.path.isfile(koifname)) or (time.time()-os.path.getmtime(koifname))/36
         print("or use: wget -O %s 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=cumulative&select=*&format=csv&'" % (koifname))
         sys.exit()
 else:
-    print("Using existing KOI file")
+    print("Using existing KOI file.")
 
 #,skip_header=147 #use this if manually downloaded
 keplerplanets = np.genfromtxt(koifname,delimiter=',',names=True)
@@ -119,7 +122,7 @@ ax.plot(ksemimajor(kepdots),massradius(kepdots),'o',mew=0,color='r',ms=3,label='
 
 #Non-Kepler planets
 planetsfname='exoplanets.csv'
-if (not os.path.isfile(planetsfname)) or (time.time()-os.path.getmtime(planetsfname))/3600.0 > 24.0:
+if (not os.path.isfile(planetsfname)) or ((time.time()-os.path.getmtime(planetsfname))/3600.0 > 24.0 and updateExoplanets==True):
     print("Downloading other planets from NASA exoplanet archive...")
     try:
         print("Downloading exoplanets from NASA exoplanet archive... (will timeout after %gs)" % (timeout))
@@ -133,7 +136,7 @@ if (not os.path.isfile(planetsfname)) or (time.time()-os.path.getmtime(planetsfn
         print("or use: wget -O %s 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets'" % (planetsfname))
         sys.exit()
 else:
-    print("Using existing planets file, downloaded within last 24 hours.")
+    print("Using existing planets file.")
 
 #,skip_header=69 use this if manually downloaded
 groundplanets = np.genfromtxt(planetsfname,delimiter=',',names=True)
@@ -228,8 +231,8 @@ ax.text(20,0.25,'$WFIRST$',color='b',rotation=45)
 #Set up the axes and labels
 
 #Weirdly, the right parenthesis character seems to be missing from FreeSerif in standard text
-ax.text(1.0,-0.08,'Credit: Penny et al. $(2018)$',fontsize=12,transform=ax.transAxes)
-ax.text(1.0,-0.12,'arXiv:1808.02490',fontsize=12,transform=ax.transAxes)
+ax.text(1.0,-0.08,'Credit: Penny et al. $(2019)$',fontsize=12,transform=ax.transAxes)
+ax.text(1.081,-0.12,'ApJS 241, 3',fontsize=12,transform=ax.transAxes)
 ax.set_axisbelow(False)
 ax.set_xlabel('Semimajor Axis in AU')
 ax.set_ylabel('Planet Mass in Earth Masses')
@@ -243,4 +246,5 @@ ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: '{:g}'.format(y))
 ax.legend(loc=3,mode="expand",bbox_to_anchor=(0.0,0.995,1.0,0.102),ncol=3,fontsize=12,numpoints=1,handletextpad=-0.5)
 plt.tight_layout()
 
-plt.savefig('%s_sensitivity.pdf' % (root),dpi=300)
+
+plt.savefig('%s_sensitivity.pdf' % (shortroot),dpi=300)
