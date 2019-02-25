@@ -8,7 +8,7 @@ Please cite the paper [Penny et al. (2019) ApJS 241, 3](https://ui.adsabs.harvar
 
 ## sensitivity/
 
-[PDF plot](https://github.com/mtpenny/wfirst-ml-figures/blob/master/sensitivity/NRO_layout_7f_3_covfac_52_3_sensitivity.pdf)
+[PDF plot](https://github.com/mtpenny/wfirst-ml-figures/blob/master/sensitivity/layout_7f_3_covfac_52_3_sensitivity.pdf)
 
 Plot of the WFIRST microlensing survey's predicted sensitivity
 
