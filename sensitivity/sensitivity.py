@@ -114,7 +114,7 @@ if plot['WFIRST_sensitivity']:
     print("y",y)
     #Contours in log sensitivity
     cf = ax.contourf(X,Y,z,cmap='Blues',levels=[-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5],vmin=-1,vmax=8)
-    cbar = plt.colorbar(cf,ax=ax,label='$WFIRST$ Sensitivity $-$ the number of planet detections\n expected if there is 1 planet per star at $(a,M_{\\rm p})$',ticks=[-1,0,1,2,3,4])
+    cbar = plt.colorbar(cf,ax=ax,label='$Roman$ Sensitivity $-$ the number of planet detections\n expected if there is 1 planet per star at $(a,M_{\\rm p})$',ticks=[-1,0,1,2,3,4])
     cbar.ax.set_yticklabels(['0.1','1','10','100','1000','10000'])
 
 
@@ -191,7 +191,7 @@ if plot['WFIRST_planets']:
     s = np.genfromtxt('c62cassan.160.47s.layout_7f_3_covfac_2.81_432.0_1.0.sample0')
     bm = np.logical_and(np.logical_and(np.log10(s[:,46])<-8-8*np.log10(s[:,47]),s[:,46]<0.001),np.log10(np.abs(s[:,30]))<=-0.4) #Remove likely false positives
     s = s[np.logical_not(bm)]
-    ax.plot(s[:,43],s[:,42]*msun,'o',mew=0,color='b',ms=3,label='Simulated $WFIRST$ Exoplanets')
+    ax.plot(s[:,43],s[:,42]*msun,'o',mew=0,color='b',ms=3,label='Simulated $Roman$ Exoplanets')
 
 
 if plot['Kepler_line']:
@@ -272,10 +272,16 @@ if plot['Solar_System_moons']:
     imscatter([9.582017],[1.346/59.736],'titan.png',ax=ax,zoom=planetsize*0.22)
 
 if plot['print_Kepler']:
-    ax.text(0.011,0.065,'$Kepler$',color='r',rotation=23)
+    rotation = 23
+    if not plot['WFIRST_sensitivity']:
+        rotation = 19
+    ax.text(0.011,0.065,'$Kepler$',color='r',rotation=rotation)
 
 if plot['print_WFIRST']:
-    ax.text(20,0.25,'$WFIRST$',color='b',rotation=45)
+    if not plot['WFIRST_sensitivity']:
+        ax.text(23,0.25,'$Roman$',color='b',rotation=40)
+    else:
+        ax.text(20,0.25,'$Roman$',color='b',rotation=45)
 
 
 #Set up the axes and labels
