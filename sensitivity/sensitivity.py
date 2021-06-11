@@ -25,7 +25,7 @@ texp=52 #sys.argv[3]
 nplanets=3 #sys.argv[4]
 
 updateExoplanets=False #Set to true if you want an up-to-date list of exoplanets plotted
-timeout=60
+timeout=2
 
 
 root = '%s_%s_%s_%s' % (design,covfac,texp,nplanets)
