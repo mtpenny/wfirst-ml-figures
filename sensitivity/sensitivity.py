@@ -152,7 +152,7 @@ if plot['Kepler_planets']:
     print(keplerplanets.shape)
     print(kepdots.shape)
     def ksemimajor(x):
-        return ((x[:]['koi_period']/365.25)**2/x[:]['koi_smass'])**(1.0/3.0)
+        return ((x[:]['koi_period']/365.25)**2*x[:]['koi_smass'])**(1.0/3.0)
     def massradius(x):
         ret = x[:]['koi_prad']**2.06 #Use the Lissauer M-R relation
         return ret
