@@ -1,6 +1,8 @@
 from __future__ import print_function
 import sys
 import configparser
+import traceback
+import pandas as pd
 
 if len(sys.argv) < 2:
     config = None
@@ -12,7 +14,7 @@ else:
 # EXAMPLE CONFIG FILE (for list of possible keys to remove see "keys" below):
 #  [DEFAULT]
 #  output file = Penny19_plot.pdf
-#  remove = WFIRST_sensitivity Kepler_planets
+#  remove = Roman_sensitivity Kepler_planets
 
 #if len(sys.argv) != 5:
 #    print("Usage: %s <design> <covfac> <texp> <nplanets>" % (sys.argv[0]))
@@ -24,7 +26,7 @@ covfac="layout_7f_3_covfac" #sys.argv[2]
 texp=52 #sys.argv[3]
 nplanets=3 #sys.argv[4]
 
-updateExoplanets=False #Set to true if you want an up-to-date list of exoplanets plotted
+updateExoplanets=True #Set to true if you want an up-to-date list of exoplanets plotted
 timeout=60
 
 
@@ -38,10 +40,10 @@ if config is not None:
 
 # Set up a dictionary which decides what is plotted and what isn't.
 keys = [
-    'WFIRST_sensitivity',
-    'Kepler_planets', 'nonKepler_planets', 'WFIRST_planets',
-    'Kepler_line', 'WFIRST_line', 'Solar_System_planets', 'Solar_System_moons',
-    'print_Kepler', 'print_WFIRST']
+    'Roman_sensitivity',
+    'Kepler_planets', 'nonKepler_planets', 'Roman_planets',
+    'Kepler_line', 'Roman_line', 'Solar_System_planets', 'Solar_System_moons',
+    'print_Kepler', 'print_Roman']
 plot = {k: True for k in keys}
 
 # Change defaults:
@@ -67,14 +69,15 @@ if float(matplotlib.__version__[0:3])>=2:
 
 
 plt.figure(figsize=(12,4.5*1.5))
-#if not (plot['WFIRST_planets'] or plot['WFIRST_sensitivity'] or plot['WFIRST_line']):
+#if not (plot['Roman_planets'] or plot['Roman_sensitivity'] or plot['Roman_line']):
 #    import matplotlib.gridspec as gridspec
 #    gs = gridspec.GridSpec(10, 1)
 #    plt.subplot(gs[2:5, 0])
     #plt.subplot2grid((10,1), (2,0), colspan=3)
 
 
-plt.rcParams["font.family"] = 'FreeSerif'
+plt.rcParams["font.family"] = 'serif'
+#plt.rcParams["font.name"] = 'Times'
 plt.rcParams["font.size"] = 18
 plt.rcParams["axes.linewidth"] = 3
 plt.rcParams['xtick.major.size'] = 10
@@ -87,7 +90,7 @@ plt.rcParams['ytick.minor.size'] = 5
 plt.rcParams['ytick.minor.width'] = 2
 
 
-fig,ax = plt.subplots(figsize=(10,4.5*1.5))
+fig,ax = plt.subplots(figsize=(12.5,4.5*1.5*1.25))
 
 
 #Axis limits
@@ -101,9 +104,9 @@ msun=1/3.0024584e-6
 
 
 
-#The background WFIRST sensitivity
+#The background Roman sensitivity
 #Grid is in log M log a, values in first two columns, sensitivity values also logged.
-if plot['WFIRST_sensitivity']:
+if plot['Roman_sensitivity']:
     smap = np.loadtxt('all.magrid.%s.%s.%s.filled' % (design,covfac,texp)) 
     x = 10**smap[:33,0]
     y = 10**smap[::33,1]
@@ -114,7 +117,7 @@ if plot['WFIRST_sensitivity']:
     print("y",y)
     #Contours in log sensitivity
     cf = ax.contourf(X,Y,z,cmap='Blues',levels=[-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5],vmin=-1,vmax=8)
-    cbar = plt.colorbar(cf,ax=ax,label='$WFIRST$ Sensitivity $-$ the number of planet detections\n expected if there is 1 planet per star at $(a,M_{\\rm p})$',ticks=[-1,0,1,2,3,4])
+    cbar = plt.colorbar(cf,ax=ax,label='$Roman$ Sensitivity $-$ the number of planet detections\n expected if there is 1 planet per star at $(a,M_{\\rm p})$',ticks=[-1,0,1,2,3,4])
     cbar.ax.set_yticklabels(['0.1','1','10','100','1000','10000'])
 
 
@@ -131,30 +134,41 @@ if plot['Kepler_planets']:
     koifname='cumulative.csv'
     if (not os.path.isfile(koifname)) or ((time.time()-os.path.getmtime(koifname))/3600.0 > 24.0 and updateExoplanets==True):
         print("Downloading KOIs from NASA exoplanet archive... (will timeout after %gs)" % (timeout))
+        reqstr='https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+cumulative&format=csv'
+        #old reqstr='https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=cumulative&select=*&format=csv&'
         try:
-            koirequest = requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=cumulative&select=*&format=csv&",timeout=timeout)
-            koifile = open(koifname,'w')
+            koirequest = requests.get(reqstr,timeout=timeout)
+            koirequest.raise_for_status()
+            print("Request status code (%s):",koirequest.status_code, ("bad","good")[koirequest.status_code==requests.codes.ok])
+            print("Here")
+            koifile = open(koifname,'wb')
             koifile.write(koirequest.content)
-            koifile.close()
+            koifile.close()    
         except:
+            etype, value, tracebk = sys.exc_info()
+            traceback.print_exception(etype,value,tracebk)
+            
+            #print("Request status code:" % (),koirequest.status_code, ("bad","good")[koirequest.status_code==requests.codes.ok])
+            #print(koirequest.headers)
+            #print(koirequest.content)
             print("Error downloading KOIs - will use existing file (%s) if it exists." % (koifname))
             print("Note: %gs timeout used. Try changing this if you have a slow connection." % (timeout))
-            print("or use: wget -O %s 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=cumulative&select=*&format=csv&'" % (koifname))
+            print("or use: wget -O %s '%s'" % (koifname,reqstr))
             sys.exit()
     else:
         print("Using existing KOI file.")
 
     #,skip_header=147 #use this if manually downloaded
-    keplerplanets = np.genfromtxt(koifname,delimiter=',',names=True)
-    print(keplerplanets[:]['koi_score'])
-    kepmask = keplerplanets[:]['koi_score']>0.5
+    keplerplanets = pd.read_csv(koifname)
+    print(keplerplanets['koi_score'])
+    kepmask = keplerplanets['koi_score']>0.5
     kepdots = keplerplanets[kepmask]
     print(keplerplanets.shape)
     print(kepdots.shape)
     def ksemimajor(x):
-        return ((x[:]['koi_period']/365.25)**2/x[:]['koi_smass'])**(1.0/3.0)
+        return ((x['koi_period']/365.25)**2/x['koi_smass'])**(1.0/3.0)
     def massradius(x):
-        ret = x[:]['koi_prad']**2.06 #Use the Lissauer M-R relation
+        ret = x['koi_prad']**2.06 #Use the Lissauer M-R relation
         return ret
     print(ksemimajor(kepdots))
     ax.plot(ksemimajor(kepdots),massradius(kepdots),'o',mew=0,color='r',ms=3,label='$Kepler$ Exoplanets')
@@ -165,33 +179,40 @@ if plot['Kepler_planets']:
 #Non-Kepler planets
 if plot['nonKepler_planets']:
     planetsfname='exoplanets.csv'
+    reqstr = 'https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+ps+where+default_flag=1&format=csv'
+    #Old "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets"
+    
     if (not os.path.isfile(planetsfname)) or ((time.time()-os.path.getmtime(planetsfname))/3600.0 > 24.0 and updateExoplanets==True):
         print("Downloading other planets from NASA exoplanet archive...")
         try:
             print("Downloading exoplanets from NASA exoplanet archive... (will timeout after %gs)" % (timeout))
-            gbrequest = requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets",timeout=timeout)
-            gbfile = open(planetsfname,'w')
+            gbrequest = requests.get(reqstr,timeout=timeout)
+            koirequest.raise_for_status()
+
+            gbfile = open(planetsfname,'wb')
             gbfile.write(gbrequest.content)
             gbfile.close()
         except:
+            etype, value, tracebk = sys.exc_info()
+            traceback.print_exception(etype,value,tracebk)
             print("Error downloading planets file - will use existing file (%s) if it exists." % (planetsfname))
             print("Note: %gs timeout used. Try changing this if you have a slow connection." % (timeout))
-            print("or use: wget -O %s 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets'" % (planetsfname))
+            print("or use: wget -O %s '%s'" % (planetsfname,reqstr))
             sys.exit()
     else:
         print("Using existing planets file.")
 
     #,skip_header=69 use this if manually downloaded
-    groundplanets = np.genfromtxt(planetsfname,delimiter=',',names=True)
-    ax.plot(groundplanets[:]['pl_orbsmax'],groundplanets[:]['pl_bmassj']*mjup,'o',mew=0,color='k',ms=3,label='Other Known Exoplanets')
+    groundplanets = pd.read_csv(planetsfname)
+    ax.plot(groundplanets['pl_orbsmax'],groundplanets['pl_bmassj']*mjup,'o',mew=0,color='k',ms=3,label='Other Known Exoplanets')
 
 
-if plot['WFIRST_planets']:
+if plot['Roman_planets']:
     #The simulated planet sample
     s = np.genfromtxt('c62cassan.160.47s.layout_7f_3_covfac_2.81_432.0_1.0.sample0')
     bm = np.logical_and(np.logical_and(np.log10(s[:,46])<-8-8*np.log10(s[:,47]),s[:,46]<0.001),np.log10(np.abs(s[:,30]))<=-0.4) #Remove likely false positives
     s = s[np.logical_not(bm)]
-    ax.plot(s[:,43],s[:,42]*msun,'o',mew=0,color='b',ms=3,label='Simulated $WFIRST$ Exoplanets')
+    ax.plot(s[:,43],s[:,42]*msun,'o',mew=0,color='b',ms=3,label='Simulated $Roman$ Exoplanets')
 
 
 if plot['Kepler_line']:
@@ -222,7 +243,7 @@ if plot['Kepler_line']:
     #ax.plot(10**sensline[:,0],10**sensline[:,1],'-',color='skyblue',lw=3)
 
     #The smooth fit to the sensitivity line
-if plot['WFIRST_line']:
+if plot['Roman_line']:
     nroaltparfile = 'fitmaplimitsolns_%s.json' % (root)
     nroaltpars = json.load(open(nroaltparfile,'r'))
 
@@ -272,17 +293,17 @@ if plot['Solar_System_moons']:
     imscatter([9.582017],[1.346/59.736],'titan.png',ax=ax,zoom=planetsize*0.22)
 
 if plot['print_Kepler']:
-    ax.text(0.011,0.065,'$Kepler$',color='r',rotation=23)
+    ax.text(0.011,0.085,'$Kepler$',color='r',rotation=23)
 
-if plot['print_WFIRST']:
-    ax.text(20,0.25,'$WFIRST$',color='b',rotation=45)
+if plot['print_Roman']:
+    ax.text(20,0.17,'$Roman$',color='b',rotation=45)
 
 
 #Set up the axes and labels
 
 #Weirdly, the right parenthesis character seems to be missing from FreeSerif in standard text
-if plot['WFIRST_sensitivity'] or plot['WFIRST_planets'] or plot['WFIRST_line']:
-    if plot['WFIRST_sensitivity']:
+if plot['Roman_sensitivity'] or plot['Roman_planets'] or plot['Roman_line']:
+    if plot['Roman_sensitivity']:
         text_xy = [1.0, -0.08, 1.081, -0.12]
     else:
         text_xy = [.72, -0.10, .801, -0.14]
