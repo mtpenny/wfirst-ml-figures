@@ -26,6 +26,7 @@ covfac="layout_7f_3_covfac" #sys.argv[2]
 texp=52 #sys.argv[3]
 nplanets=3 #sys.argv[4]
 
+
 updateExoplanets=True #Set to true if you want an up-to-date list of exoplanets plotted
 timeout=60
 
@@ -167,6 +168,7 @@ if plot['Kepler_planets']:
     print(kepdots.shape)
     def ksemimajor(x):
         return ((x['koi_period']/365.25)**2/x['koi_smass'])**(1.0/3.0)
+
     def massradius(x):
         ret = x['koi_prad']**2.06 #Use the Lissauer M-R relation
         return ret
